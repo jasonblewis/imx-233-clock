@@ -55,9 +55,10 @@ function toggle_segment {
 function display_number {
     all_off
     echo showing number $1
+    looparray=d"$1[@]"
     for i in ${!segments[@]}
     do
-        echo segment $i is ${ ${d[$1]}[$i] }
+        echo segment $i is ${ ${!looparray}[][$i] }
     done
 }
 
