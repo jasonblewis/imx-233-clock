@@ -15,7 +15,7 @@ segments=( ["sega"]="16"
 
 # mapping of segments to numbers
 #   a b c d e f g dp
-declare -A d0=(["sega"]="0" ["segb"]="0" ["segc"]="0" ["segd"]="0" ["sege"]="0" ["segf"]="0" ["segg"]="0" ["segdp"]="0" )
+declare -A d0=(["sega"]="1" ["segb"]="1" ["segc"]="1" ["segd"]="1" ["sege"]="1" ["segf"]="1" ["segg"]="0" ["segdp"]="0" )
 declare -A d1=(["sega"]="0" ["segb"]="1" ["segc"]="1" ["segd"]="0" ["sege"]="0" ["segf"]="0" ["segg"]="0" ["segdp"]="0" )
 declare -A d2=(["sega"]="1" ["segb"]="1" ["segc"]="0" ["segd"]="1" ["sege"]="1" ["segf"]="0" ["segg"]="1" ["segdp"]="0" )
 declare -A d3=(["sega"]="1" ["segb"]="1" ["segc"]="1" ["segd"]="1" ["sege"]="0" ["segf"]="0" ["segg"]="1" ["segdp"]="0" )
