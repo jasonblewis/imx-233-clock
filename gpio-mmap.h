@@ -15,7 +15,7 @@ int *gpio_mmap = 0;
 
 int *gpio_map() {
 	int fd;
-	if (gpio_mmap != 0) return;
+	if (gpio_mmap != 0) return 0;
 	fd = open("/dev/mem", O_RDWR);
 	if( fd < 0 ) {
 		perror("Unable to open /dev/mem");

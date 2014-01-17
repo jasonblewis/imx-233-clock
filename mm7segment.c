@@ -36,9 +36,8 @@
 #define SSDISP_8 0b01110011
 #define SSDISP_9 0b01111110
 
-
 enum ssdigit {  
-eSEGA,
+  eSEGA,
   eSEGB,
   eSEGC,
   eSEGD,
@@ -46,26 +45,29 @@ eSEGA,
   eSEGF,
   eSEGG,
   eSEGH,
+  eSEGDP,
   item_count
-  };
+};
 
-int digit1[item_count]; //= {16,7,6,5,4,51,2,1};
+
+
+typedef int digit [item_count]; 
+//digit digit1; //= {16,7,6,5,4,51,2,1};
+const digit digit1 = {16,7,6,5,4,51,2,1};
+
+// turn off all segments and dp of a digit
+void initialise_digit(const digit ldigit) {
+    for ( int x = 0; x < item_count; x++) {
+      GPIO_WRITE_PIN(ldigit[x],0);
+    }
+}
+
 
 int display_digit(unsigned char num) {
 }
 
 int main() {
-
-digit1[eSEGA] = 16;
-digit1[eSEGB] = 7;
-digit1[eSEGC] = 6;
-digit1[eSEGD] = 5;
-digit1[eSEGE] = 4;
-digit1[eSEGF] = 51;
-digit1[eSEGG] = 2;
-digit1[eSEGH] = 1;
-
-
+  
   gpio_map();
   //  gpio_output(2,1); //bank 2 bit 1 = GPIO65 the LED on board
   gpio_output(BBGPIO_01); 
@@ -77,30 +79,27 @@ digit1[eSEGH] = 1;
   gpio_output(BBGPIO_16);
   gpio_output(BBGPIO_51);
   
+  initialise_digit(digit1);
+
   while (1) {
-    GPIO_WRITE_PIN(SEGA,1);
-    GPIO_WRITE_PIN(SEGB,1);
-    GPIO_WRITE_PIN(SEGC,1);
-    GPIO_WRITE_PIN(SEGD,1);
-    GPIO_WRITE_PIN(SEGE,1);
-    GPIO_WRITE_PIN(SEGF,1);
-    GPIO_WRITE_PIN(SEGG,1);
-//    GPIO_WRITE_PIN(SEGDP,1);
+
+    // write a one to each pin in the digit, excluding decimal point
+    for ( int x = 0; x < item_count; x++) {
+      GPIO_WRITE_PIN(digit1[x],1);
+    }
+    
     sleep(1);
-    GPIO_WRITE_PIN(SEGA,0);
-    GPIO_WRITE_PIN(SEGB,0);
-    GPIO_WRITE_PIN(SEGC,0);
-    GPIO_WRITE_PIN(SEGD,0);
-    GPIO_WRITE_PIN(SEGE,0);
-    GPIO_WRITE_PIN(SEGF,0);
-    GPIO_WRITE_PIN(SEGG,0);
-//    GPIO_WRITE_PIN(SEGDP,0);
+
+    for ( int x = 0; x < item_count; x++) {
+      GPIO_WRITE_PIN(digit1[x],0);
+    }
+
     sleep(1);
   }
 }
 
 /*
 # Local Variables:
-# compile-command: "gcc -o mm7segment mm7segment.c"
+# compile-command: "gcc -std=gnu99 -pedantic -o mm7segment mm7segment.c"
 # End:
 */
