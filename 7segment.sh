@@ -62,18 +62,36 @@ function display_number {
     done
 }
 
+function uninitialise {
+    #for i in 1 2 4 5 6 7 16 51
+    for i in "${segments[@]}"
+    do
+        if [[ ! -L /sys/class/gpio/gpio$i ]]
+        then
+            #        echo exporting gpio $i
+            echo $i > /sys/class/gpio/export
+            echo in > /sys/class/gpio/gpio $i/direction
+            #   echo 0 > /sys/class/gpio/gpio$i/value
+        fi    
+    done
+}
+
+
 # initialise 
-#for i in 1 2 4 5 6 7 16 51
-for i in "${segments[@]}"
-do
-    if [[ ! -L /sys/class/gpio/gpio$i ]]
-    then
-#        echo exporting gpio $i
-        echo $i > /sys/class/gpio/export
-        echo out > /sys/class/gpio/gpio$i/direction
-        #   echo 0 > /sys/class/gpio/gpio$i/value
-    fi    
-done
+function initialise {
+    #for i in 1 2 4 5 6 7 16 51
+    for i in "${segments[@]}"
+    do
+        if [[ ! -L /sys/class/gpio/gpio$i ]]
+        then
+            #        echo exporting gpio $i
+            echo $i > /sys/class/gpio/export
+            echo out > /sys/class/gpio/gpio $i/direction
+            #   echo 0 > /sys/class/gpio/gpio$i/value
+        fi    
+    done
+}
+
 
 
 while :
@@ -83,11 +101,21 @@ do
             usage
             exit 0
             ;;
+        -u | --uninit)
+            uninitialise
+            exit 0
+            ;;
+        -i | --init)
+            initialise
+            exit 0
+            ;;
         a | b | c | d | e | f | g | dp)
+            initialise
             toggle_segment "$1"
             shift
             ;;
         0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+            initialise
             display_number "$1"
             shift
             ;;

@@ -1,18 +1,11 @@
 // http://olimex.wordpress.com/2012/09/11/imx233-olinuxino-gpios-faster-and-faster/
 // http://www.jann.cc/2013/05/04/imx233_olinuxino_current_state.html
 // gcc -o mm7segment mm7segment.c
+
+
 #include "gpio-mmap.h"
 #include <stdio.h>
 #include <time.h>
-
-#define SEGA 16
-#define SEGB 7
-#define SEGC 6
-#define SEGD 5
-#define SEGE 4
-#define SEGF 51
-#define SEGG 2
-#define SEGDP 1
 
 #define BBGPIO_01 0,1 // where BB stands for Bank Bit
 #define BBGPIO_02 0,2
@@ -21,7 +14,7 @@
 #define BBGPIO_06 0,6
 #define BBGPIO_07 0,7
 #define BBGPIO_16 0,16
-#define BBGPIO_51 0,51
+#define BBGPIO_51 1,19
 
    ///bit number 76543210    least significant 7 bits contain the decoder
    ///           -abcdefg
@@ -50,11 +43,22 @@ enum ssdigit {
 };
 
 
-
 typedef int digit [item_count]; 
 //digit digit1; //= {16,7,6,5,4,51,2,1};
 const digit digit1 = {16,7,6,5,4,51,2,1};
 
+void initialise_io() {
+  //gpio_map();
+ 
+  gpio_output(BBGPIO_01);
+  gpio_output(BBGPIO_02);
+  gpio_output(BBGPIO_04);
+  gpio_output(BBGPIO_05);
+  gpio_output(BBGPIO_06);
+  gpio_output(BBGPIO_07);
+  gpio_output(BBGPIO_16);
+  gpio_output(BBGPIO_51);
+}
 // turn off all segments and dp of a digit
 void initialise_digit(const digit ldigit) {
     for ( int x = 0; x < item_count; x++) {
@@ -63,37 +67,29 @@ void initialise_digit(const digit ldigit) {
 }
 
 
-int display_digit(unsigned char num) {
+int display_number(digit ldigig, unsigned char num) {
+
 }
 
 int main() {
   
   gpio_map();
-  //  gpio_output(2,1); //bank 2 bit 1 = GPIO65 the LED on board
-  gpio_output(BBGPIO_01); 
-  gpio_output(BBGPIO_02);
-  gpio_output(BBGPIO_04);
-  gpio_output(BBGPIO_05);
-  gpio_output(BBGPIO_06);
-  gpio_output(BBGPIO_07);
-  gpio_output(BBGPIO_16);
-  gpio_output(BBGPIO_51);
+  
+  initialise_io;
   
   initialise_digit(digit1);
 
   while (1) {
 
     // write a one to each pin in the digit, excluding decimal point
-    for ( int x = 0; x < item_count; x++) {
+    for ( int x = 0; x < eSEGH; x++) {
       GPIO_WRITE_PIN(digit1[x],1);
     }
-    
     sleep(1);
 
-    for ( int x = 0; x < item_count; x++) {
+    for ( int x = 0; x < eSEGH; x++) {
       GPIO_WRITE_PIN(digit1[x],0);
     }
-
     sleep(1);
   }
 }
