@@ -49,7 +49,7 @@ typedef int digit [item_count];
 const digit digit1 = {16,7,6,5,4,51,2,1};
 
 void initialise_io() {
-  //gpio_map();
+  gpio_map();
  
   gpio_output(BBGPIO_01);
   gpio_output(BBGPIO_02);
@@ -75,7 +75,7 @@ int display_number(digit ldigig, unsigned char num) {
 
 int main() {
   
-  gpio_map();
+  //gpio_map();
   
   initialise_io();
   

@@ -1,0 +1,16 @@
+* About
+  This is a project to make an clock out of 7 segment
+  displays directly connected to the GPIO ports of the [[https://www.olimex.com/Products/OLinuXino/iMX233/iMX233-OLinuXino-MINI-WiFi/][iMX233 OLinuXino
+Mini Wifi]].
+* Which Distro to use?
+  I tried numerous prebuilt images for this device before finding a
+  stable and up to date one. As of the writing of this, the most up to
+  date image seems to be the [[http://archlinuxarm.org/][archlinux-arm]] one. It is up to date and
+  as far as I can tell all the patches for the OLinuXino are already
+  applied. Download it from [[http://archlinuxarm.org/os/ArchLinuxARM-olinuxino-latest.img.gz][here]].
+* License
+  All the code in this repo is licensed under the GPL3
+* Contact
+  you can contact me on jason at NOdicksonSPAM dot st. Remove the
+  obvious, replace the necessary.
+
