@@ -2,3 +2,5 @@
 /mmap
 /mm7segment
 /mm7segment.i
+/gpio-mmap.o
+/mm7segment.o

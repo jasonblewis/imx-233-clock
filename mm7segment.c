@@ -6,6 +6,7 @@
 #include "gpio-mmap.h"
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
 
 #define BBGPIO_01 0,1 // where BB stands for Bank Bit
 #define BBGPIO_02 0,2
@@ -68,14 +69,15 @@ void initialise_digit(const digit ldigit) {
 
 
 int display_number(digit ldigig, unsigned char num) {
-
+  usleep(1);
+  return 0;
 }
 
 int main() {
   
   gpio_map();
   
-  initialise_io;
+  initialise_io();
   
   initialise_digit(digit1);
 
@@ -96,6 +98,6 @@ int main() {
 
 /*
 # Local Variables:
-# compile-command: "gcc -std=gnu99 -pedantic -o mm7segment mm7segment.c"
+# compile-command: "gcc -Wall -std=gnu99 -pedantic -o mm7segment mm7segment.c"
 # End:
 */
