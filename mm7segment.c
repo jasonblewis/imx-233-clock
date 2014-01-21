@@ -19,16 +19,26 @@
 
    ///bit number 76543210    least significant 7 bits contain the decoder
    ///           -abcdefg
-#define SSDISP_0 0b01111110
-#define SSDISP_1 0b01100000
-#define SSDISP_2 0b01101101
-#define SSDISP_3 0b01111001
-#define SSDISP_4 0b00110011
-#define SSDISP_5 0b01011011
-#define SSDISP_6 0b01011111
-#define SSDISP_7 0b01110000
-#define SSDISP_8 0b01110011
-#define SSDISP_9 0b01111110
+//                        hgfedcba
+#define SSDISP_0 0x3F //0b00111111
+#define SSDISP_1 0x06 //0b00000110
+#define SSDISP_2 0b01011011
+#define SSDISP_3 0b01001111
+#define SSDISP_4 0b01100110
+#define SSDISP_5 0b01101101
+#define SSDISP_6 0b01111101
+#define SSDISP_7 0b00000111
+#define SSDISP_8 0b01111111
+#define SSDISP_9 0b01101111
+
+#define SSDISP_a 0b00000001
+#define SSDISP_b 0b00000010
+#define SSDISP_c 0b00000100
+#define SSDISP_d 0b00001000
+#define SSDISP_e 0b00010000
+#define SSDISP_f 0b00100000
+#define SSDISP_g 0b01000000
+#define SSDISP_h 0b10000000
 
 enum ssdigit {  
   eSEGA,
@@ -68,36 +78,42 @@ void initialise_digit(const digit ldigit) {
 }
 
 
-int display_number(digit ldigig, unsigned char num) {
-  usleep(1);
-  return 0;
+void display_number(const digit ldigig, const unsigned char num) {
+  for ( int x = 0; x < eSEGH; x++) {
+    GPIO_WRITE_PIN(digit1[x],(SSDISP_9 >> x) & 1);
+  }
 }
 
+#define sleepon 150000
+#define sleepoff 150000
 int main() {
-  
-  //gpio_map();
   
   initialise_io();
   
   initialise_digit(digit1);
+  /* initialise_digit(digit2); */
+  /* initialise_digit(digit3); */
+  /* initialise_digit(digit4); */
 
   while (1) {
 
     // write a one to each pin in the digit, excluding decimal point
-    for ( int x = 0; x < eSEGH; x++) {
-      GPIO_WRITE_PIN(digit1[x],1);
-    }
-    sleep(1);
+    /* for ( int x = 0; x < eSEGH; x++) { */
+    /*   GPIO_WRITE_PIN(digit1[x],1); */
+    /* } */
+    display_number(digit1,7);
+    usleep(sleepon);
 
-    for ( int x = 0; x < eSEGH; x++) {
-      GPIO_WRITE_PIN(digit1[x],0);
-    }
-    sleep(1);
+    /* for ( int x = 0; x < eSEGH; x++) { */
+    /*   GPIO_WRITE_PIN(digit1[x],0); */
+    /* } */
+    initialise_digit(digit1);
+    usleep(sleepoff);
   }
 }
 
 /*
 # Local Variables:
-# compile-command: "gcc -Wall -std=gnu99 -pedantic -o mm7segment mm7segment.c"
+# compile-command: "make mm7segment"
 # End:
 */
