@@ -18,18 +18,19 @@
 #define BBGPIO_51 1,19
 
    ///bit number 76543210    least significant 7 bits contain the decoder
-   ///           -abcdefg
-//                        hgfedcba
-#define SSDISP_0 0x3F //0b00111111
-#define SSDISP_1 0x06 //0b00000110
-#define SSDISP_2 0b01011011
-#define SSDISP_3 0b01001111
-#define SSDISP_4 0b01100110
-#define SSDISP_5 0b01101101
-#define SSDISP_6 0b01111101
-#define SSDISP_7 0b00000111
-#define SSDISP_8 0b01111111
-#define SSDISP_9 0b01101111
+
+//                         hgfedcba
+#define SSDISP_0 0x3F // 0b00111111
+#define SSDISP_1 0x06 // 0b00000110
+#define SSDISP_2 0x5B // 0b01011011
+#define SSDISP_3 0x4F // 0b01001111
+#define SSDISP_4 0x66 // 0b01100110
+#define SSDISP_5 0x6D // 0b01101101
+#define SSDISP_6 0x7D // 0b01111101
+#define SSDISP_7 0x07 // 0b00000111
+#define SSDISP_8 0x7F // 0b01111111
+#define SSDISP_9 0x6F // 0b01101111
+
 
 #define SSDISP_a 0b00000001
 #define SSDISP_b 0b00000010
@@ -40,8 +41,21 @@
 #define SSDISP_g 0b01000000
 #define SSDISP_h 0b10000000
 
+const char ssdisp[10] = {
+  SSDISP_0,
+  SSDISP_1,
+  SSDISP_2,
+  SSDISP_3,
+  SSDISP_4,
+  SSDISP_5,
+  SSDISP_6,
+  SSDISP_7,
+  SSDISP_8,
+  SSDISP_9
+    }; 
+
 enum ssdigit {  
-  eSEGA,
+eSEGA,
   eSEGB,
   eSEGC,
   eSEGD,
@@ -51,7 +65,7 @@ enum ssdigit {
   eSEGH,
   eSEGDP,
   item_count
-};
+  };
 
 
 typedef int digit [item_count]; 
@@ -78,15 +92,27 @@ void initialise_digit(const digit ldigit) {
 }
 
 
-void display_number(const digit ldigig, const unsigned char num) {
-  for ( int x = 0; x < eSEGH; x++) {
-    GPIO_WRITE_PIN(digit1[x],(SSDISP_9 >> x) & 1);
+int display_number(const digit ldigig, const unsigned char num) {
+/* takes a digit of type digit, and a number 0-9 and displays that number on the digit */
+  if ((num < 0) || (num > 9) ) {
+    //printf("display_number can only accept num from 0-9\n");
+    return 1;
+      } else {
+    for ( int x = 0; x < eSEGH; x++) {
+      GPIO_WRITE_PIN(digit1[x],(ssdisp[num] >> x) & 1);
+      //printf("displayed %d\n",num);
+    }
   }
+  return 0;
 }
 
-#define sleepon 150000
-#define sleepoff 150000
+#define sleepon 5
+#define sleepoff 1995
+
 int main() {
+  
+  time_t rawtime;
+  struct tm * timeinfo;
   
   initialise_io();
   
@@ -94,19 +120,21 @@ int main() {
   /* initialise_digit(digit2); */
   /* initialise_digit(digit3); */
   /* initialise_digit(digit4); */
-
+  
   while (1) {
-
+    
     // write a one to each pin in the digit, excluding decimal point
     /* for ( int x = 0; x < eSEGH; x++) { */
     /*   GPIO_WRITE_PIN(digit1[x],1); */
     /* } */
-    display_number(digit1,7);
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    display_number(digit1,(timeinfo->tm_sec) % 10);
     usleep(sleepon);
-
+    
     /* for ( int x = 0; x < eSEGH; x++) { */
     /*   GPIO_WRITE_PIN(digit1[x],0); */
-    /* } */
+/* } */
     initialise_digit(digit1);
     usleep(sleepoff);
   }

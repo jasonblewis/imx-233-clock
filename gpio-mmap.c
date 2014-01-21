@@ -5,13 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-
-
 #include "gpio-mmap.h"
-
-
-
-
 
 int *gpio_mmap;
 
