@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include <inttypes.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <sched.h>
+#include <string.h>
 
 #define BBGPIO_01 0,1 // where BB stands for Bank Bit
 #define BBGPIO_02 0,2
@@ -72,6 +77,18 @@ typedef int digit [item_count];
 //digit digit1; //= {16,7,6,5,4,51,2,1};
 const digit digit1 = {16,7,6,5,4,51,2,1};
 
+const unsigned int PWMTable[] = {
+  0,    1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 13,
+  16,   19, 23, 26, 29, 32,  35,  39,  43,  47,  51,  55, 60, 66,
+  71,   77, 84, 91, 98, 106, 114, 123, 133, 143, 154, 166,
+  179,  192, 207, 222, 239, 257, 276, 296, 317, 341, 366,
+  392,  421, 451, 483, 518, 555, 595, 638, 684, 732, 784,
+  840,  900, 964, 1032, 1105, 1184, 1267, 1357, 1453, 1555,
+  1665, 1782, 1907, 2042, 2185, 2339, 2503, 2679, 2867, 3069,
+  3284, 3514, 3761, 4024, 4096};
+
+const char max_brightness = 55;
+
 void initialise_io() {
   gpio_map();
  
@@ -111,32 +128,52 @@ int display_number(const digit ldigig, const unsigned char num) {
 
 int main() {
   
+  struct sched_param sp;
+  memset( &sp, 0, sizeof(sp) );
+  sp.sched_priority = 99;
+  sched_setscheduler( 0, SCHED_FIFO, &sp );
+ 
+
+  uint16_t pwm_counter = 0;
   time_t rawtime;
   struct tm * timeinfo;
-  
   initialise_io();
   
   initialise_digit(digit1);
   /* initialise_digit(digit2); */
   /* initialise_digit(digit3); */
   /* initialise_digit(digit4); */
-  
+  uint32_t loop_counter = 0;
+  char cursecond = 0;
+  char oldsecond = 11; //out of usual bounds
+  bool displayed = false;
   while (1) {
     
-    // write a one to each pin in the digit, excluding decimal point
-    /* for ( int x = 0; x < eSEGH; x++) { */
-    /*   GPIO_WRITE_PIN(digit1[x],1); */
-    /* } */
+    // get current time
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
-    display_number(digit1,(timeinfo->tm_sec) % 10);
-    usleep(sleepon);
+    cursecond = (timeinfo->tm_sec) % 10;
+    if (pwm_counter < PWMTable[10]) {
+      // display last digit of seconds of current time
+      if (!displayed) {
+        display_number (digit1,(cursecond));
+        displayed = true;
+      }
+      oldsecond = cursecond;
+    } else {
+      if (displayed) {
+        initialise_digit (digit1);
+        displayed = false;
+      }
+    };
     
-    /* for ( int x = 0; x < eSEGH; x++) { */
-    /*   GPIO_WRITE_PIN(digit1[x],0); */
-/* } */
-    initialise_digit(digit1);
-    usleep(sleepoff);
+    // reset counter to 0
+    if (pwm_counter++ > PWMTable[max_brightness]) {
+      pwm_counter = 0;
+      //printf("reset pwm_counter from %u to 0\n",pwm_counter-1);
+    };
+    if (loop_counter++ > 6000000) { 
+      exit(0); };
   }
 }
 

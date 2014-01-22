@@ -5,3 +5,5 @@
 /gpio-mmap.o
 /mm7segment.o
 /sample/time
+/analysis.txt
+/gmon.out
