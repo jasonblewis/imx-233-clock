@@ -7,3 +7,5 @@
 /sample/time
 /analysis.txt
 /gmon.out
+/clock_nanosleep
+/clock_nanosleep.o

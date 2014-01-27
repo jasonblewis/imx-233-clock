@@ -1,6 +1,5 @@
 // http://olimex.wordpress.com/2012/09/11/imx233-olinuxino-gpios-faster-and-faster/
 // http://www.jann.cc/2013/05/04/imx233_olinuxino_current_state.html
-// gcc -o mm7segment mm7segment.c
 
 
 #include "gpio-mmap.h"
@@ -134,7 +133,6 @@ int main() {
   /* sched_setscheduler( 0, SCHED_FIFO, &sp ); */
  
 
-  uint16_t pwm_counter = 0;
   time_t rawtime;
   struct tm * timeinfo;
   initialise_io();
@@ -148,42 +146,55 @@ int main() {
   uint32_t loop_counter = 0;
   #endif
   char cursecond = 0;
-  char oldsecond = 11; //out of usual bounds
   bool displayed = false;
+
+  uint64_t sleep_for = 1000*1000*.2;    // 12ms
+  uint64_t sleep_for_on = 1000*10*.21;    // 12ms
+  uint64_t sleep_for_off = 1000*1000*12;    // 12ms
+  
+  struct timespec tp;
+  clock_gettime(CLOCK_MONOTONIC, &tp);
+  
   while (1) {
+    if (displayed) {
+      sleep_for = sleep_for_off;
+    } else {
+      sleep_for = sleep_for_on;
+    };
     
+    uint64_t next_ns = (uint64_t)tp.tv_nsec + sleep_for;
+    tp.tv_sec += next_ns  / 1000000000;
+    tp.tv_nsec = next_ns % 1000000000;
+
+
     // get current time
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
     cursecond = (timeinfo->tm_sec) % 10;
-    if (pwm_counter < PWMTable[10]) {
-      // display last digit of seconds of current time
-      if (!displayed) {
+    // display last digit of seconds of current time
+    if (!displayed) {
         display_number (digit1,(cursecond));
         displayed = true;
-      }
-      oldsecond = cursecond;
-    } else {
-      if (displayed) {
-        initialise_digit (digit1);
-        displayed = false;
-      }
+    }
+    else {
+      initialise_digit (digit1);
+      displayed = false;
     };
     
-    // reset counter to 0
-    if (pwm_counter++ > PWMTable[max_brightness]) {
-      pwm_counter = 0;
-      //printf("reset pwm_counter from %u to 0\n",pwm_counter-1);
-    };
+ 
+    
+   
     #ifdef gperf
     if (loop_counter++ > 6000000) { 
       exit(0); };
     #endif
+    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, NULL));
+    
   }
 }
 
 /*
 # Local Variables:
-# compile-command: "make mm7segment"
+# compile-command: "make clock_nanosleep"
 # End:
 */
