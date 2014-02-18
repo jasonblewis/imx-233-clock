@@ -9,3 +9,5 @@
 /gmon.out
 /clock_nanosleep
 /clock_nanosleep.o
+tlc5947_bitbang
+tlc5947_bitbang.o
