@@ -3,11 +3,15 @@
 gpio=/sys/class/gpio/gpio
 
 declare -A spipins
-segments=( ["lat"]="13"
+spipins=(  ["lat"]="13" 
            ["oebar"]="12"
            ["clk"]="11"
-           ["din"]="10"
+           ["din"]="10")
 
+lat=/sys/class/gpio/gpio13/value
+oebar=/sys/class/gpio/gpio12/value
+clk=/sys/class/gpio/gpio11/value
+din=/sys/class/gpio/gpio10/value
 
 function uninitialise {
     for i in "${spipins[@]}"
@@ -33,13 +37,49 @@ function initialise {
             #        echo exporting gpio $i
             echo $i > /sys/class/gpio/export
             echo out > /sys/class/gpio/gpio $i/direction
-            #   echo 0 > /sys/class/gpio/gpio$i/value
+            
         fi    
     done
+    echo 0 > $clk
+    echo 0 > $lat
 }
 
-function
 
+# set clock to 0
+# set lat to 0
+# for i in 1..288
+#  set data bit
+#  set clock
+#  clear clock
+#  rotate data left
+# end for
+# set lat
+# clear lat
+
+
+function all_on {
+    for i in {{1..288}}; do
+        echo 1 > $din
+        echo 1 > $clk
+        echo 0 > $clk
+    done
+    echo 1 > $lat
+    echo 0 > $lat
+} 
+
+function all_off {
+    for i in {{1..288}}; do
+        echo 0 > $din
+        echo 1 > $clk
+        echo 0 > $clk
+    done
+    echo 1 > $lat
+    echo 0 > $lat
+} 
+
+function usage {
+    echo usage;
+}
 
 while :
 do
@@ -56,15 +96,13 @@ do
             initialise
             exit 0
             ;;
-        a | b | c | d | e | f | g | dp)
-            initialise
-            toggle_segment "$1"
-            shift
+        all_on )
+            all_on
+            exit 0
             ;;
-        0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
-            initialise
-            display_number "$1"
-            shift
+        all_off )
+            all_off
+            exit 0
             ;;
         *) # no more options
             break
