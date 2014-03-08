@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <time.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -16,108 +17,106 @@
 
 
 
-int main( int argc, char *argv[] ) {
+struct gpio_s {
+  int bank;
+  int pin;
+};
 
-  struct gpio_s {
-    int bank;
-    int pin;
-  };
-
-  struct gpio_s gpio[] = {
-    { 0 ,   0 }, // pin 0 
-    { 0 ,   1 }, // pin 1 
-    { 0 ,   2 }, // pin 2 
-    { 0 ,   3 }, // pin 3 
-    { 0 ,   4 }, // pin 4 
-    { 0 ,   5 }, // pin 5 
-    { 0 ,   6 }, // pin 6 
-    { 0 ,   7 }, // pin 7 
-    { 0 ,   8 }, // pin 8 
-    { 0 ,   9 }, // pin 9 
-    { 0 ,  10 }, // pin 10 
-    { 0 ,  11 }, // pin 11 
-    { 0 ,  12 }, // pin 12 
-    { 0 ,  13 }, // pin 13 
-    { 0 ,  14 }, // pin 14 
-    { 0 ,  15 }, // pin 15 
-    { 0 ,  16 }, // pin 16 
-    { 0 ,  17 }, // pin 17 
-    { 0 ,  18 }, // pin 18 
-    { 0 ,  19 }, // pin 19 
-    { 0 ,  20 }, // pin 20 
-    { 0 ,  21 }, // pin 21 
-    { 0 ,  22 }, // pin 22 
-    { 0 ,  23 }, // pin 23 
-    { 0 ,  24 }, // pin 24 
-    { 0 ,  25 }, // pin 25 
-    { 0 ,  26 }, // pin 26 
-    { 0 ,  27 }, // pin 27 
-    { 0 ,  28 }, // pin 28 
-    { 0 ,  29 }, // pin 29 
-    { 0 ,  30 }, // pin 30 
-    { 0 ,  31 }, // pin 31 
-    { 1 ,   0 }, // pin 32 
-    { 1 ,   1 }, // pin 33 
-    { 1 ,   2 }, // pin 34 
-    { 1 ,   3 }, // pin 35 
-    { 1 ,   4 }, // pin 36 
-    { 1 ,   5 }, // pin 37 
-    { 1 ,   6 }, // pin 38 
-    { 1 ,   7 }, // pin 39 
-    { 1 ,   8 }, // pin 40 
-    { 1 ,   9 }, // pin 41 
-    { 1 ,  10 }, // pin 42 
-    { 1 ,  11 }, // pin 43 
-    { 1 ,  12 }, // pin 44 
-    { 1 ,  13 }, // pin 45 
-    { 1 ,  14 }, // pin 46 
-    { 1 ,  15 }, // pin 47 
-    { 1 ,  16 }, // pin 48 
-    { 1 ,  17 }, // pin 49 
-    { 1 ,  18 }, // pin 50 
-    { 1 ,  19 }, // pin 51 
-    { 1 ,  20 }, // pin 52 
-    { 1 ,  21 }, // pin 53 
-    { 1 ,  22 }, // pin 54 
-    { 1 ,  23 }, // pin 55 
-    { 1 ,  24 }, // pin 56 
-    { 1 ,  25 }, // pin 57 
-    { 1 ,  26 }, // pin 58 
-    { 1 ,  27 }, // pin 59 
-    { 1 ,  28 }, // pin 60 
-    { 1 ,  29 }, // pin 61 
-    { 1 ,  30 }, // pin 62 
-    { 1 ,  31 }, // pin 63 
-    { 2 ,   0 }, // pin 64 
-    { 2 ,   1 }, // pin 65 
-    { 2 ,   2 }, // pin 66 
-    { 2 ,   3 }, // pin 67 
-    { 2 ,   4 }, // pin 68 
-    { 2 ,   5 }, // pin 69 
-    { 2 ,   6 }, // pin 70 
-    { 2 ,   7 }, // pin 71 
-    { 2 ,   8 }, // pin 72 
-    { 2 ,   9 }, // pin 73 
-    { 2 ,  10 }, // pin 74 
-    { 2 ,  11 }, // pin 75 
-    { 2 ,  12 }, // pin 76 
-    { 2 ,  13 }, // pin 77 
-    { 2 ,  14 }, // pin 78 
-    { 2 ,  15 }, // pin 79 
-    { 2 ,  16 }, // pin 80 
-    { 2 ,  17 }, // pin 81 
-    { 2 ,  18 }, // pin 82 
-    { 2 ,  19 }, // pin 83 
-    { 2 ,  20 }, // pin 84 
-    { 2 ,  21 }, // pin 85
-    { 2 ,  22 }, // pin 86
-    { 2 ,  23 }, // pin 87
-    { 2 ,  24 }, // pin 88
-    { 2 ,  25 }, // pin 89
-    { 2 ,  26 }, // pin 90
-    { 2 ,  27 }, // pin 91
-    { 2 ,  28 }  // pin 92
-  };
+struct gpio_s gpio[] = {
+  { 0 ,   0 }, // pin 0 
+  { 0 ,   1 }, // pin 1 
+  { 0 ,   2 }, // pin 2 
+  { 0 ,   3 }, // pin 3 
+  { 0 ,   4 }, // pin 4 
+  { 0 ,   5 }, // pin 5 
+  { 0 ,   6 }, // pin 6 
+  { 0 ,   7 }, // pin 7 
+  { 0 ,   8 }, // pin 8 
+  { 0 ,   9 }, // pin 9 
+  { 0 ,  10 }, // pin 10 
+  { 0 ,  11 }, // pin 11 
+  { 0 ,  12 }, // pin 12 
+  { 0 ,  13 }, // pin 13 
+  { 0 ,  14 }, // pin 14 
+  { 0 ,  15 }, // pin 15 
+  { 0 ,  16 }, // pin 16 
+  { 0 ,  17 }, // pin 17 
+  { 0 ,  18 }, // pin 18 
+  { 0 ,  19 }, // pin 19 
+  { 0 ,  20 }, // pin 20 
+  { 0 ,  21 }, // pin 21 
+  { 0 ,  22 }, // pin 22 
+  { 0 ,  23 }, // pin 23 
+  { 0 ,  24 }, // pin 24 
+  { 0 ,  25 }, // pin 25 
+  { 0 ,  26 }, // pin 26 
+  { 0 ,  27 }, // pin 27 
+  { 0 ,  28 }, // pin 28 
+  { 0 ,  29 }, // pin 29 
+  { 0 ,  30 }, // pin 30 
+  { 0 ,  31 }, // pin 31 
+  { 1 ,   0 }, // pin 32 
+  { 1 ,   1 }, // pin 33 
+  { 1 ,   2 }, // pin 34 
+  { 1 ,   3 }, // pin 35 
+  { 1 ,   4 }, // pin 36 
+  { 1 ,   5 }, // pin 37 
+  { 1 ,   6 }, // pin 38 
+  { 1 ,   7 }, // pin 39 
+  { 1 ,   8 }, // pin 40 
+  { 1 ,   9 }, // pin 41 
+  { 1 ,  10 }, // pin 42 
+  { 1 ,  11 }, // pin 43 
+  { 1 ,  12 }, // pin 44 
+  { 1 ,  13 }, // pin 45 
+  { 1 ,  14 }, // pin 46 
+  { 1 ,  15 }, // pin 47 
+  { 1 ,  16 }, // pin 48 
+  { 1 ,  17 }, // pin 49 
+  { 1 ,  18 }, // pin 50 
+  { 1 ,  19 }, // pin 51 
+  { 1 ,  20 }, // pin 52 
+  { 1 ,  21 }, // pin 53 
+  { 1 ,  22 }, // pin 54 
+  { 1 ,  23 }, // pin 55 
+  { 1 ,  24 }, // pin 56 
+  { 1 ,  25 }, // pin 57 
+  { 1 ,  26 }, // pin 58 
+  { 1 ,  27 }, // pin 59 
+  { 1 ,  28 }, // pin 60 
+  { 1 ,  29 }, // pin 61 
+  { 1 ,  30 }, // pin 62 
+  { 1 ,  31 }, // pin 63 
+  { 2 ,   0 }, // pin 64 
+  { 2 ,   1 }, // pin 65 
+  { 2 ,   2 }, // pin 66 
+  { 2 ,   3 }, // pin 67 
+  { 2 ,   4 }, // pin 68 
+  { 2 ,   5 }, // pin 69 
+  { 2 ,   6 }, // pin 70 
+  { 2 ,   7 }, // pin 71 
+  { 2 ,   8 }, // pin 72 
+  { 2 ,   9 }, // pin 73 
+  { 2 ,  10 }, // pin 74 
+  { 2 ,  11 }, // pin 75 
+  { 2 ,  12 }, // pin 76 
+  { 2 ,  13 }, // pin 77 
+  { 2 ,  14 }, // pin 78 
+  { 2 ,  15 }, // pin 79 
+  { 2 ,  16 }, // pin 80 
+  { 2 ,  17 }, // pin 81 
+  { 2 ,  18 }, // pin 82 
+  { 2 ,  19 }, // pin 83 
+  { 2 ,  20 }, // pin 84 
+  { 2 ,  21 }, // pin 85
+  { 2 ,  22 }, // pin 86
+  { 2 ,  23 }, // pin 87
+  { 2 ,  24 }, // pin 88
+  { 2 ,  25 }, // pin 89
+  { 2 ,  26 }, // pin 90
+  { 2 ,  27 }, // pin 91
+  { 2 ,  28 }  // pin 92
+};
 
 
 
@@ -133,9 +132,9 @@ int main( int argc, char *argv[] ) {
       } else {                                                          \
         GPIO_WRITE_PIN(din, 0);                                              \
       }                                                                 \
-      nanosleep(1000);                                                  \
+      usleep(1);                                                  \
       GPIO_WRITE_PIN(clk, 0);                                               \
-      nanosleep(1000);                                                  \
+      usleep(1);                                                        \
       GPIO_WRITE_PIN(clk, 1);                                               \
                                                                         \
       ldata <<= 1;                                                       \
@@ -149,7 +148,7 @@ int main( int argc, char *argv[] ) {
 uint16_t segment[segments];
 
 
-static void Initialize_SPI(void)
+void Initialize_SPI(void)
 {
   gpio_map();
   // Initialise SPI Interface pins as GPIOs
@@ -191,6 +190,6 @@ int main(int argc, char **argv)
 
 /*
 # Local Variables:
-# compile-command: "make tlc5847_bitbang"
+# compile-command: "make tlc5947_bitbang"
 # End:
 */
