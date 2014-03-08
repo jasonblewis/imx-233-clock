@@ -11,3 +11,6 @@
 /clock_nanosleep.o
 tlc5947_bitbang
 tlc5947_bitbang.o
+/mm-test-gpio
+*.o
+*~

@@ -3,7 +3,7 @@
 gpio=/sys/class/gpio/gpio
 
 declare -A spipins
-spipins=(  ["lat"]="13" 
+spipins=(  ["lat"]="16" 
            ["oebar"]="12"
            ["clk"]="11"
            ["din"]="10")
@@ -16,11 +16,11 @@ din=/sys/class/gpio/gpio10/value
 function uninitialise {
     for i in "${spipins[@]}"
     do
-        if [[ ! -L /sys/class/gpio/gpio$i ]]
+        if [[ -L /sys/class/gpio/gpio$i ]]
         then
             #        echo exporting gpio $i
-            echo $i > /sys/class/gpio/export
-            echo in > /sys/class/gpio/gpio $i/direction
+            echo in > /sys/class/gpio/gpio$i/direction
+            echo $i > /sys/class/gpio/unexport
             #   echo 0 > /sys/class/gpio/gpio$i/value
         fi    
     done
@@ -36,7 +36,7 @@ function initialise {
         then
             #        echo exporting gpio $i
             echo $i > /sys/class/gpio/export
-            echo out > /sys/class/gpio/gpio $i/direction
+            echo out > /sys/class/gpio/gpio$i/direction
             
         fi    
     done
@@ -77,6 +77,9 @@ function all_off {
     echo 0 > $lat
 } 
 
+function test_pin {
+    initialise
+
 function usage {
     echo usage;
 }
@@ -97,6 +100,7 @@ do
             exit 0
             ;;
         all_on )
+        #    initialise
             all_on
             exit 0
             ;;
@@ -104,6 +108,12 @@ do
             all_off
             exit 0
             ;;
+	-t )
+	    testpin=$2
+	    shift 2
+	    test_pin(
+	    exit 0
+	    ;;
         *) # no more options
             break
             ;;

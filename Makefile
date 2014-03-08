@@ -18,6 +18,10 @@ clock_nanosleep: clock_nanosleep.o gpio-mmap.o
 tlc5947_bitbang: tlc5947_bitbang.o gpio-mmap.o
 	$(CC) $(CFLAGS) -o $@ $^ 
 
+mm-test-gpio: mm-test-gpio.o gpio-mmap.o
+	$(CC) $(CFLAGS) -o $@ $^ 
+
+
 clean:
 	rm -f *.o
 
