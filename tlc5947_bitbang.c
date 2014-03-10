@@ -119,10 +119,21 @@ struct gpio_s gpio[] = {
 };
 
 
+const unsigned int PWMTable[] = {
+  0,    1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 13,
+  16,   19, 23, 26, 29, 32,  35,  39,  43,  47,  51,  55, 60, 66,
+  71,   77, 84, 91, 98, 106, 114, 123, 133, 143, 154, 166,
+  179,  192, 207, 222, 239, 257, 276, 296, 317, 341, 366,
+  392,  421, 451, 483, 518, 555, 595, 638, 684, 732, 784,
+  840,  900, 964, 1032, 1105, 1184, 1267, 1357, 1453, 1555,
+  1665, 1782, 1907, 2042, 2185, 2339, 2503, 2679, 2867, 3069,
+  3284, 3514, 3761, 4024, 4096};
+
+const unsigned int PWMTable_count = 85;
 
 #define Twh1ns 30 // minimum pulse duration  
 
-#define SEND_BYTE_SPI(data)                                              \
+#define SEND_WORD_SPI(data)                                              \
   {                                                                      \
     uint16_t ldata = data;                                                        \
     ldata <<=4;                                                          \
@@ -132,15 +143,15 @@ struct gpio_s gpio[] = {
       } else {                                                          \
         GPIO_WRITE_PIN(din, 0);                                              \
       }                                                                 \
-      usleep(1);                                                  \
+      usleep(10);                                                  \
       GPIO_WRITE_PIN(clk, 0);                                               \
-      usleep(1);                                                        \
+      usleep(10);                                                        \
       GPIO_WRITE_PIN(clk, 1);                                               \
                                                                         \
       ldata <<= 1;                                                       \
-    }                                                                   \
+    } \
+                                          \
   }
-
 
 
 #define segments 24
@@ -157,35 +168,44 @@ void Initialize_SPI(void)
   gpio_output(gpio[clk].bank,gpio[clk].pin); // clk
   gpio_output(gpio[din].bank,gpio[din].pin); // din
 
-  GPIO_WRITE(0,2,1); //clk
-  GPIO_WRITE(0,1,1); //din
+  GPIO_WRITE(gpio[clk].bank,gpio[clk].pin,1); //clk
+  GPIO_WRITE(gpio[din].bank,gpio[din].pin,1); //din
+  GPIO_WRITE(gpio[lat].bank,gpio[lat].pin,1); //lat
+  GPIO_WRITE(gpio[output_enable_bar].bank,gpio[output_enable_bar].pin,0); //output_enable_bar
 }
 
 /* END OF SECTION */
 
-
-
-
-void LEDInit(void)
+void setLEDs(void)
 {  	
-	// Initialie SPI Interface
-    Initialize_SPI();
-    for (int i=0; i < segments - 1; i++ ) {
-      segment[i] = 0;
-      SEND_BYTE_SPI(segment[i]);
+  // send latch low
+  GPIO_WRITE(gpio[lat].bank,gpio[lat].pin,0);
+  usleep(1);
+  
+  for (int i=(segments -1); i >= 0; i-- ) {
+      SEND_WORD_SPI(segment[i]);
     }
+  usleep(1);
+  // send latch high
+  GPIO_WRITE(gpio[lat].bank,gpio[lat].pin,1);  
+  usleep(1);
       
 }
 
- 
 int main(int argc, char **argv)
 {
-	Initialize_SPI();
-
-	return 0;
-
+  Initialize_SPI();
+  int whileloop=0;
+  while(whileloop++ <= 10) {
+    for (int pos = 0; pos < 16; pos++) {
+      segment[pos] = 0x000;
+      segment[(pos + 1 ) % 16] = PWMTable[55];
+      setLEDs();
+      usleep(100);
+    }
+  }
+  return 0;
 }
-
 
 
 /*
