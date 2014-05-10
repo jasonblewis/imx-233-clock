@@ -9,3 +9,13 @@
 /gmon.out
 /clock_nanosleep
 /clock_nanosleep.o
+tlc5947_bitbang
+tlc5947_bitbang.o
+/mm-test-gpio
+*.o
+*~
+/gpio-mmap.gcda
+/gpio-mmap.gcno
+/tlc5947_bitbang.c.gcov
+/tlc5947_bitbang.gcda
+/tlc5947_bitbang.gcno
