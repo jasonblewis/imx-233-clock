@@ -57,7 +57,7 @@ void send_word_spi(uint16_t data) {
   } 
 }
 
-#define segments 24
+#define segments 48
 
 uint16_t segment[segments];
 
@@ -98,12 +98,11 @@ void setLEDs(void)
 int main(int argc, char **argv)
 {
   Initialize_SPI();
-  int whileloop=0;
-  while(whileloop++ <= 100) {
-    for (int pos = 0; pos < 16; pos++) {
+  while(1) {
+    for (int pos = 0; pos < 24; pos++) {
       segment[pos] = 0x000;
-      segment[(pos + 1 ) % 16] = PWMTable[55];
-      segment[(pos + 2 ) % 16] = PWMTable[55];
+      segment[(pos + 1 ) % 24] = PWMTable[55];
+      segment[(pos + 2 ) % 24] = PWMTable[55];
       setLEDs();
       usleep(1);
     }
